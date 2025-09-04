@@ -49,6 +49,7 @@ model User {
   email         String?   @unique
   emailVerified DateTime?
   image         String?
+  password      String?   // For credentials-based authentication
   createdAt     DateTime  @default(now()) @map(name: "created_at")
   updatedAt     DateTime  @default(now()) @map(name: "updated_at")
 
@@ -59,6 +60,12 @@ model User {
   stripeSubscriptionId   String?   @unique @map(name: "stripe_subscription_id")
   stripePriceId          String?   @map(name: "stripe_price_id")
   stripeCurrentPeriodEnd DateTime? @map(name: "stripe_current_period_end")
+
+  // Government contractor profile fields
+  company_name      String?  @db.VarChar(255)
+  naics_codes       String?  @db.Text
+  profile_completed Boolean  @default(false)
+  business_verified Boolean  @default(false)
 
   @@map(name: "users")
 }

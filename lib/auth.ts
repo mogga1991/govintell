@@ -2,6 +2,8 @@ import { PrismaAdapter } from "@next-auth/prisma-adapter"
 import { NextAuthOptions } from "next-auth"
 import EmailProvider from "next-auth/providers/email"
 import GitHubProvider from "next-auth/providers/github"
+import CredentialsProvider from "next-auth/providers/credentials"
+import bcrypt from "bcryptjs"
 import { Client } from "postmark"
 
 import { env } from "@/env.mjs"
@@ -25,6 +27,49 @@ export const authOptions: NextAuthOptions = {
     GitHubProvider({
       clientId: env.GITHUB_CLIENT_ID,
       clientSecret: env.GITHUB_CLIENT_SECRET,
+    }),
+    CredentialsProvider({
+      id: "credentials",
+      name: "credentials",
+      credentials: {
+        email: { label: "Email", type: "email" },
+        password: { label: "Password", type: "password" },
+      },
+      async authorize(credentials) {
+        if (!credentials?.email || !credentials?.password) {
+          return null
+        }
+
+        const user = await db.user.findUnique({
+          where: {
+            email: credentials.email,
+          },
+        })
+
+        if (!user || !user.password) {
+          return null
+        }
+
+        const isPasswordValid = await bcrypt.compare(
+          credentials.password,
+          user.password
+        )
+
+        if (!isPasswordValid) {
+          return null
+        }
+
+        return {
+          id: user.id,
+          email: user.email,
+          name: user.name,
+          image: user.image,
+          company_name: user.company_name,
+          naics_codes: user.naics_codes,
+          profile_completed: user.profile_completed,
+          business_verified: user.business_verified,
+        }
+      },
     }),
     EmailProvider({
       from: env.SMTP_FROM,
@@ -76,6 +121,10 @@ export const authOptions: NextAuthOptions = {
         session.user.name = token.name
         session.user.email = token.email
         session.user.image = token.picture
+        session.user.company_name = token.company_name
+        session.user.naics_codes = token.naics_codes
+        session.user.profile_completed = token.profile_completed
+        session.user.business_verified = token.business_verified
       }
 
       return session
@@ -95,10 +144,15 @@ export const authOptions: NextAuthOptions = {
       }
 
       return {
+        ...token,
         id: dbUser.id,
         name: dbUser.name,
         email: dbUser.email,
         picture: dbUser.image,
+        company_name: dbUser.company_name,
+        naics_codes: dbUser.naics_codes,
+        profile_completed: dbUser.profile_completed,
+        business_verified: dbUser.business_verified,
       }
     },
   },
