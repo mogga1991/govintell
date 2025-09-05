@@ -9,14 +9,18 @@ export const dashboardConfig: DashboardConfig = {
     {
       title: "Support",
       href: "/support",
-      disabled: true,
     },
   ],
   sidebarNav: [
     {
-      title: "Posts",
+      title: "Dashboard",
       href: "/dashboard",
       icon: "post",
+    },
+    {
+      title: "RFQ Opportunities",
+      href: "/dashboard/rfqs",
+      icon: "building",
     },
     {
       title: "Billing",

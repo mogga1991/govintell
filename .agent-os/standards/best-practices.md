@@ -1,57 +1,16 @@
-# Development Best Practices
+## Architectural Principles
 
-## Context
+- **Server-First**: Leverage React Server Components (RSCs) for data fetching and backend logic wherever possible. Client Components (`'use client'`) should only be used for interactivity.
+- **API Routes**: Use Next.js API Routes (`app/api/...`) for backend logic that needs to be called from the client, such as form submissions or orchestrating AI agents.
+- **Type Safety is Paramount**: All code must be strongly typed. Use Zod for runtime validation of API inputs and environment variables.
 
-Global development guidelines for Agent OS projects.
+## Database Logic
 
-<conditional-block context-check="core-principles">
-IF this Core Principles section already read in current context:
-  SKIP: Re-reading this section
-  NOTE: "Using Core Principles already in context"
-ELSE:
-  READ: The following principles
+- All database queries via Prisma **must** occur on the server (in Server Components or API Routes). Never expose your Prisma client to the browser.
+- The schema (`prisma/schema.prisma`) is the single source of truth for the database.
+- The `relationMode` must be set to `"prisma"`.
+- After any schema change, the database must be synced by running `n-px prisma db push`.
 
-## Core Principles
+## Environment Variables
 
-### Keep It Simple
-- Implement code in the fewest lines possible
-- Avoid over-engineering solutions
-- Choose straightforward approaches over clever ones
-
-### Optimize for Readability
-- Prioritize code clarity over micro-optimizations
-- Write self-documenting code with clear variable names
-- Add comments for "why" not "what"
-
-### DRY (Don't Repeat Yourself)
-- Extract repeated business logic to private methods
-- Extract repeated UI markup to reusable components
-- Create utility functions for common operations
-
-### File Structure
-- Keep files focused on a single responsibility
-- Group related functionality together
-- Use consistent naming conventions
-</conditional-block>
-
-<conditional-block context-check="dependencies" task-condition="choosing-external-library">
-IF current task involves choosing an external library:
-  IF Dependencies section already read in current context:
-    SKIP: Re-reading this section
-    NOTE: "Using Dependencies guidelines already in context"
-  ELSE:
-    READ: The following guidelines
-ELSE:
-  SKIP: Dependencies section not relevant to current task
-
-## Dependencies
-
-### Choose Libraries Wisely
-When adding third-party dependencies:
-- Select the most popular and actively maintained option
-- Check the library's GitHub repository for:
-  - Recent commits (within last 6 months)
-  - Active issue resolution
-  - Number of stars/downloads
-  - Clear documentation
-</conditional-block>
+- Access all environment variables through the validated `env.mjs` file to ensure type safety.

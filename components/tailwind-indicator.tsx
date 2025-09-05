@@ -1,5 +1,13 @@
+"use client"
+
+import { useMounted } from "@/hooks/use-mounted"
+
 export function TailwindIndicator() {
+  const mounted = useMounted()
+  
   if (process.env.NODE_ENV === "production") return null
+  
+  if (!mounted) return null
 
   return (
     <div className="fixed bottom-1 left-1 z-50 flex h-6 w-6 items-center justify-center rounded-full bg-gray-800 p-3 font-mono text-xs text-white">

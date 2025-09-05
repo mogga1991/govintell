@@ -1,24 +1,74 @@
 import {
+  AlertCircle,
   AlertTriangle,
+  ArrowLeft,
   ArrowRight,
+  ArrowUp,
+  ArrowDown,
+  Bookmark,
+  Brush,
+  Building,
+  Building2,
+  Calculator,
+  Calendar,
+  Car,
   Check,
+  Clipboard,
+  CheckCircle,
+  ChevronDown,
   ChevronLeft,
   ChevronRight,
+  Circle,
+  Clock,
   Command,
   CreditCard,
+  DollarSign,
+  Download,
+  Edit,
+  ExternalLink,
   File,
   FileText,
+  Filter,
+  Flag,
+  Flame,
+  GraduationCap,
+  Grid,
+  Hammer,
+  Heart,
   HelpCircle,
   Image,
+  Inbox,
+  Info,
   Laptop,
+  Lightbulb,
+  List,
   Loader2,
   LucideProps,
+  Map,
+  MapPin,
+  Microscope,
+  Monitor,
   Moon,
   MoreVertical,
+  Mountain,
+  Package,
   Pizza,
   Plus,
+  Radio,
+  RefreshCw,
+  Rocket,
+  Scale,
+  ScanLine,
+  Search,
+  Send,
   Settings,
+  Shield,
+  ShieldCheck,
+  Sofa,
+  Sprout,
+  Stethoscope,
   SunMedium,
+  Target,
   Trash,
   Twitter,
   User,
@@ -29,7 +79,61 @@ import {
 export type Icon = LucideIcon
 
 export const Icons = {
-  logo: Command,
+  logo: ({ ...props }: LucideProps) => (
+    <svg
+      viewBox="0 0 40 40"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+      {...props}
+    >
+      {/* Outer shield representing government/security */}
+      <path
+        d="M20 2L32 8V18C32 28 20 36 20 36C20 36 8 28 8 18V8L20 2Z"
+        fill="currentColor"
+        opacity="0.1"
+        stroke="currentColor"
+        strokeWidth="1.5"
+      />
+      
+      {/* Capitol dome/government building silhouette */}
+      <path
+        d="M12 24H28V26H12V24Z"
+        fill="currentColor"
+        opacity="0.8"
+      />
+      <rect x="14" y="20" width="12" height="4" fill="currentColor" opacity="0.7"/>
+      <rect x="16" y="16" width="8" height="4" fill="currentColor" opacity="0.8"/>
+      
+      {/* Dome */}
+      <path
+        d="M18 16C18 14.8954 18.8954 14 20 14C21.1046 14 22 14.8954 22 16H18Z"
+        fill="currentColor"
+        opacity="0.9"
+      />
+      <rect x="19.5" y="12" width="1" height="2" fill="currentColor"/>
+      
+      {/* Intelligence network nodes */}
+      <circle cx="15" cy="12" r="1.5" fill="currentColor" opacity="0.6"/>
+      <circle cx="25" cy="12" r="1.5" fill="currentColor" opacity="0.6"/>
+      <circle cx="12" cy="18" r="1.5" fill="currentColor" opacity="0.6"/>
+      <circle cx="28" cy="18" r="1.5" fill="currentColor" opacity="0.6"/>
+      
+      {/* Network connections */}
+      <path
+        d="M15 12L20 14M25 12L20 14M12 18L20 16M28 18L20 16"
+        stroke="currentColor"
+        strokeWidth="0.8"
+        opacity="0.4"
+      />
+      
+      {/* Data visualization bars at bottom */}
+      <rect x="14" y="28" width="1.5" height="4" fill="currentColor" opacity="0.5"/>
+      <rect x="16.5" y="30" width="1.5" height="2" fill="currentColor" opacity="0.5"/>
+      <rect x="19" y="27" width="1.5" height="5" fill="currentColor" opacity="0.5"/>
+      <rect x="21.5" y="29" width="1.5" height="3" fill="currentColor" opacity="0.5"/>
+      <rect x="24" y="26" width="1.5" height="6" fill="currentColor" opacity="0.5"/>
+    </svg>
+  ),
   close: X,
   spinner: Loader2,
   chevronLeft: ChevronLeft,
@@ -50,6 +154,19 @@ export const Icons = {
   sun: SunMedium,
   moon: Moon,
   laptop: Laptop,
+  alertCircle: AlertCircle,
+  checkCircle: CheckCircle,
+  circle: Circle,
+  edit: Edit,
+  lightbulb: Lightbulb,
+  x: X,
+  building: Building,
+  calendar: Calendar,
+  dollar: DollarSign,
+  filter: Filter,
+  map: Map,
+  mapPin: MapPin,
+  target: Target,
   gitHub: ({ ...props }: LucideProps) => (
     <svg
       aria-hidden="true"
@@ -69,4 +186,55 @@ export const Icons = {
   ),
   twitter: Twitter,
   check: Check,
+  sortAsc: ArrowUp,
+  sortDesc: ArrowDown,
+  list: List,
+  grid: Grid,
+  search: Search,
+  arrowLeft: ArrowLeft,
+  bookmark: Bookmark,
+  bookmarkCheck: Bookmark,
+  building2: Building2,
+  calculator: Calculator,
+  chevronDown: ChevronDown,
+  clipboard: Clipboard,
+  clock: Clock,
+  dot: Circle,
+  dollarSign: DollarSign,
+  download: Download,
+  externalLink: ExternalLink,
+  flag: Flag,
+  graduationCap: GraduationCap,
+  heart: Heart,
+  inbox: Inbox,
+  info: Info,
+  loader2: Loader2,
+  refresh: RefreshCw,
+  rocket: Rocket,
+  scale: Scale,
+  send: Send,
+  shield: Shield,
+  shieldCheck: ShieldCheck,
+  sprout: Sprout,
+  banknote: CreditCard,
+  // Medical and lab icons
+  stethoscope: Stethoscope,
+  microscope: Microscope,
+  // Technology icons
+  monitor: Monitor,
+  car: Car,
+  radio: Radio,
+  // Furniture and tools
+  sofa: Sofa,
+  hammer: Hammer,
+  // Security and scanning
+  scan: ScanLine,
+  // Cleaning
+  spraycan: Brush,
+  sprayCan: Brush, // alias for kebab-case
+  // Safety
+  flame: Flame,
+  // General
+  package: Package,
+  mountain: Mountain,
 }

@@ -1,9 +1,13 @@
-import * as React from "react"
+import { useEffect, useState } from 'react'
 
+/**
+ * Hook to check if component is mounted on client side.
+ * Useful for avoiding hydration mismatches with SSR.
+ */
 export function useMounted() {
-  const [mounted, setMounted] = React.useState(false)
+  const [mounted, setMounted] = useState(false)
 
-  React.useEffect(() => {
+  useEffect(() => {
     setMounted(true)
   }, [])
 

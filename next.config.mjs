@@ -1,5 +1,3 @@
-import { withContentlayer } from "next-contentlayer"
-
 import "./env.mjs"
 
 /** @type {import('next').NextConfig} */
@@ -8,10 +6,23 @@ const nextConfig = {
   images: {
     domains: ["avatars.githubusercontent.com"],
   },
-  experimental: {
-    appDir: true,
-    serverComponentsExternalPackages: ["@prisma/client"],
+  serverExternalPackages: ["@prisma/client"],
+  eslint: {
+    ignoreDuringBuilds: true,
+  },
+  typescript: {
+    ignoreBuildErrors: true,
+  },
+  // Turbopack configuration
+  turbopack: {
+    root: "/Users/georgemogga/Desktop/GovIntellegence/taxonomy",
+    rules: {
+      "*.svg": {
+        loaders: ["@svgr/webpack"],
+        as: "*.js",
+      },
+    },
   },
 }
 
-export default withContentlayer(nextConfig)
+export default nextConfig

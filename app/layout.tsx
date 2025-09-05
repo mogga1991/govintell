@@ -26,49 +26,23 @@ interface RootLayoutProps {
 
 export const metadata = {
   title: {
-    default: siteConfig.name,
-    template: `%s | ${siteConfig.name}`,
+    default: "GovIntelligence",
+    template: "%s | GovIntelligence",
   },
-  description: siteConfig.description,
+  description: "Government contracting intelligence and RFQ management platform",
   keywords: [
-    "Next.js",
-    "React",
-    "Tailwind CSS",
-    "Server Components",
-    "Radix UI",
+    "government contracting",
+    "RFQ",
+    "NAICS codes",
+    "PSC codes",
+    "federal contracts",
   ],
-  authors: [
-    {
-      name: "shadcn",
-      url: "https://shadcn.com",
-    },
-  ],
-  creator: "shadcn",
-  themeColor: [
-    { media: "(prefers-color-scheme: light)", color: "white" },
-    { media: "(prefers-color-scheme: dark)", color: "black" },
-  ],
-  openGraph: {
-    type: "website",
-    locale: "en_US",
-    url: siteConfig.url,
-    title: siteConfig.name,
-    description: siteConfig.description,
-    siteName: siteConfig.name,
-  },
-  twitter: {
-    card: "summary_large_image",
-    title: siteConfig.name,
-    description: siteConfig.description,
-    images: [`${siteConfig.url}/og.jpg`],
-    creator: "@shadcn",
-  },
+  creator: "GovIntelligence",
   icons: {
     icon: "/favicon.ico",
     shortcut: "/favicon-16x16.png",
     apple: "/apple-touch-icon.png",
   },
-  manifest: `${siteConfig.url}/site.webmanifest`,
 }
 
 export default function RootLayout({ children }: RootLayoutProps) {

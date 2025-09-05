@@ -11,9 +11,20 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import { Icons } from "@/components/icons"
+import { useMounted } from "@/hooks/use-mounted"
 
 export function ModeToggle() {
+  const mounted = useMounted()
   const { setTheme } = useTheme()
+
+  if (!mounted) {
+    return (
+      <Button variant="ghost" size="sm" className="h-8 w-8 px-0" suppressHydrationWarning>
+        <Icons.sun className="h-4 w-4" />
+        <span className="sr-only">Toggle theme</span>
+      </Button>
+    )
+  }
 
   return (
     <DropdownMenu>

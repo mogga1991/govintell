@@ -46,31 +46,36 @@ export function UserNameForm({ user, className, ...props }: UserNameFormProps) {
   async function onSubmit(data: FormData) {
     setIsSaving(true)
 
-    const response = await fetch(`/api/users/${user.id}`, {
-      method: "PATCH",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        name: data.name,
-      }),
-    })
+    try {
+      const response = await fetch("/api/user/profile", {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          name: data.name,
+        }),
+      })
 
-    setIsSaving(false)
+      if (!response?.ok) {
+        const error = await response.json()
+        throw new Error(error.error || "Failed to update name")
+      }
 
-    if (!response?.ok) {
-      return toast({
+      toast({
+        description: "Your name has been updated.",
+      })
+
+      router.refresh()
+    } catch (error) {
+      toast({
         title: "Something went wrong.",
-        description: "Your name was not updated. Please try again.",
+        description: error instanceof Error ? error.message : "Your name was not updated. Please try again.",
         variant: "destructive",
       })
+    } finally {
+      setIsSaving(false)
     }
-
-    toast({
-      description: "Your name has been updated.",
-    })
-
-    router.refresh()
   }
 
   return (

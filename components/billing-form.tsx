@@ -48,7 +48,7 @@ export function BillingForm({
     // This could be a checkout page for initial upgrade.
     // Or portal to manage existing subscription.
     const session = await response.json()
-    if (session) {
+    if (session && typeof window !== 'undefined') {
       window.location.href = session.url
     }
   }

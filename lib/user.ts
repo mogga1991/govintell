@@ -1,10 +1,11 @@
 import { User } from "@prisma/client"
 import { REQUIRED_PROFILE_FIELDS, ProfileRequiredFields } from "@/types/user"
+import { UserProfile } from "@/types/user-profile"
 
 /**
  * Check if user profile is complete based on required fields
  */
-export function checkProfileCompletion(user: User) {
+export function checkProfileCompletion(user: UserProfile | User) {
   const missingFields: string[] = []
   
   REQUIRED_PROFILE_FIELDS.forEach((field: ProfileRequiredFields) => {
@@ -40,6 +41,26 @@ export function validateNaicsCodes(codes: string): boolean {
  * Format NAICS codes for display
  */
 export function formatNaicsCodes(codes: string | null): string[] {
+  if (!codes) return []
+  return codes.split(",").map(code => code.trim()).filter(Boolean)
+}
+
+/**
+ * Validate PSC codes format
+ */
+export function validatePscCodes(codes: string): boolean {
+  if (!codes) return false
+  
+  const codesArray = codes.split(",")
+  return codesArray.every(code => 
+    code.trim().match(/^[A-Z0-9]{4}$/)
+  )
+}
+
+/**
+ * Format PSC codes for display
+ */
+export function formatPscCodes(codes: string | null): string[] {
   if (!codes) return []
   return codes.split(",").map(code => code.trim()).filter(Boolean)
 }

@@ -64,8 +64,15 @@ model User {
   // Government contractor profile fields
   company_name      String?  @db.VarChar(255)
   naics_codes       String?  @db.Text
+  psc_codes         String?  @db.Text  // Product Service Codes
   profile_completed Boolean  @default(false)
   business_verified Boolean  @default(false)
+
+  // RFQ relationships
+  savedRfqs    SavedRfq[]
+  rfqStatuses  RfqStatus[]
+  alertConfigs UserAlertConfig[]
+  matchScores  RfqMatchScore[]
 
   @@map(name: "users")
 }
@@ -77,5 +84,184 @@ model VerificationToken {
 
   @@unique([identifier, token])
   @@map(name: "verification_tokens")
+}
+
+// RFQ (Request for Quotation) model
+model Rfq {
+  id          String   @id @default(cuid())
+  title       String   @db.VarChar(500)
+  description String   @db.Text
+  agency      String   @db.VarChar(255)
+  
+  // Classification codes
+  naics_codes String   @db.Text // Comma-separated NAICS codes
+  psc_codes   String?  @db.Text // Comma-separated PSC codes
+  
+  // Location and logistics  
+  location    String   @db.VarChar(255)
+  state       String?  @db.VarChar(50)
+  city        String?  @db.VarChar(100)
+  
+  // Contract details
+  contract_value_min Decimal? @db.Decimal(15,2)
+  contract_value_max Decimal? @db.Decimal(15,2)
+  contract_type      String?  @db.VarChar(100) // FFP, T&M, Cost Plus, etc.
+  set_aside_type     String?  @db.VarChar(100) // Small Business, 8(a), HUBZone, etc.
+  
+  // Important dates
+  posted_date    DateTime
+  deadline_date  DateTime
+  response_date  DateTime? // When responses are due
+  
+  // Status and metadata
+  status         String   @default("Open") @db.VarChar(50) // Open, Closed, Awarded, Cancelled
+  solicitation_number String @unique @db.VarChar(100)
+  source_url     String?  @db.Text
+  source_system  String?  @db.VarChar(50) // SAM.gov, FedBizOpps, etc.
+  
+  // Timestamps
+  createdAt DateTime @default(now()) @map(name: "created_at")
+  updatedAt DateTime @default(now()) @map(name: "updated_at")
+  
+  // Relationships
+  savedBy     SavedRfq[]
+  statusTracking RfqStatus[]
+  matchScores RfqMatchScore[]
+  
+  // Indexes for performance
+  @@index([status, deadline_date])
+  @@index([agency])
+  @@index([posted_date])
+  @@index([naics_codes(length: 255)])
+  @@index([state])
+  @@index([contract_value_min, contract_value_max])
+  @@map(name: "rfqs")
+}
+
+// User's saved/bookmarked RFQs
+model SavedRfq {
+  id       String @id @default(cuid())
+  userId   String
+  rfqId    String
+  
+  // Organization
+  folder   String? @db.VarChar(100) // Custom folder name
+  notes    String? @db.Text        // User's private notes
+  priority String? @db.VarChar(50) // High, Medium, Low
+  
+  // Timestamps
+  createdAt DateTime @default(now()) @map(name: "created_at")
+  updatedAt DateTime @default(now()) @map(name: "updated_at")
+  
+  // Relations
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  rfq  Rfq  @relation(fields: [rfqId], references: [id], onDelete: Cascade)
+  
+  // Prevent duplicate saves
+  @@unique([userId, rfqId])
+  @@index([userId, folder])
+  @@index([userId, priority])
+  @@map(name: "saved_rfqs")
+}
+
+// RFQ status tracking for user pipeline management
+model RfqStatus {
+  id       String @id @default(cuid())
+  userId   String
+  rfqId    String
+  
+  // Status tracking
+  status   String @db.VarChar(50) // watched, applied, submitted, won, lost, no_bid
+  
+  // Application details
+  applied_date    DateTime? // When user applied
+  submission_date DateTime? // When proposal was submitted  
+  award_date      DateTime? // When contract was awarded
+  contract_value  Decimal?  @db.Decimal(15,2) // Awarded contract value
+  
+  // Notes and tracking
+  notes           String? @db.Text
+  confidence_score Int?   // User's confidence in winning (1-10)
+  
+  // Timestamps
+  createdAt DateTime @default(now()) @map(name: "created_at")
+  updatedAt DateTime @default(now()) @map(name: "updated_at")
+  
+  // Relations
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  rfq  Rfq  @relation(fields: [rfqId], references: [id], onDelete: Cascade)
+  
+  // One status per user per RFQ
+  @@unique([userId, rfqId])
+  @@index([userId, status])
+  @@index([applied_date])
+  @@map(name: "rfq_statuses")
+}
+
+// User alert configuration for RFQ notifications
+model UserAlertConfig {
+  id     String @id @default(cuid())
+  userId String
+  
+  // Alert settings
+  enabled              Boolean @default(true)
+  email_enabled        Boolean @default(true)
+  min_match_score      Int     @default(80)    // Minimum match score to trigger alert
+  max_contract_value   Decimal? @db.Decimal(15,2) // Maximum contract value filter
+  min_contract_value   Decimal? @db.Decimal(15,2) // Minimum contract value filter
+  
+  // Location preferences
+  preferred_states     String? @db.Text // Comma-separated state codes
+  include_remote       Boolean @default(true)
+  
+  // Frequency settings
+  alert_frequency      String  @default("realtime") @db.VarChar(50) // realtime, daily, weekly
+  digest_day           Int?    // Day of week for weekly digest (1-7)
+  digest_time          Int?    // Hour of day for digest (0-23)
+  
+  // Timestamps
+  createdAt DateTime @default(now()) @map(name: "created_at")
+  updatedAt DateTime @default(now()) @map(name: "updated_at")
+  
+  // Relations
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  // One config per user
+  @@unique([userId])
+  @@map(name: "user_alert_configs")
+}
+
+// RFQ match scores for caching intelligent matching results
+model RfqMatchScore {
+  id      String @id @default(cuid())
+  userId  String
+  rfqId   String
+  
+  // Matching scores (0-100)
+  overall_score    Int
+  naics_score      Int
+  psc_score        Int?
+  location_score   Int
+  value_score      Int
+  experience_score Int
+  
+  // Match details
+  matching_naics   String? @db.Text // Which NAICS codes matched
+  matching_psc     String? @db.Text // Which PSC codes matched
+  score_breakdown  String? @db.Text // JSON with detailed scoring
+  
+  // Timestamps
+  createdAt DateTime @default(now()) @map(name: "created_at")
+  updatedAt DateTime @default(now()) @map(name: "updated_at")
+  
+  // Relationships
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  rfq  Rfq  @relation(fields: [rfqId], references: [id], onDelete: Cascade)
+  
+  // Prevent duplicate scores and enable fast lookups
+  @@unique([userId, rfqId])
+  @@index([userId, overall_score])
+  @@index([rfqId, overall_score])
+  @@map(name: "rfq_match_scores")
 }
 

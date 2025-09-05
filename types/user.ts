@@ -10,6 +10,7 @@ export type UserWithProfile = User & {
 export interface UserProfileUpdate {
   company_name?: string
   naics_codes?: string
+  psc_codes?: string
 }
 
 // User profile status for frontend components
@@ -27,10 +28,19 @@ export interface NaicsCode {
   description: string
 }
 
+// PSC code structure for frontend
+export interface PscCode {
+  code: string
+  title: string
+  description: string
+  category?: string
+}
+
 // Form validation types
 export interface UserProfileFormData {
   company_name: string
   naics_codes: string
+  psc_codes: string
 }
 
 // API response types
@@ -45,6 +55,7 @@ export interface ProfileUpdateResponse {
   user: {
     company_name: string
     naics_codes: string
+    psc_codes: string
     profile_completed: boolean
   }
 }
@@ -53,12 +64,17 @@ export interface NaicsSearchResponse {
   naics_codes: NaicsCode[]
 }
 
+export interface PscSearchResponse {
+  psc_codes: PscCode[]
+}
+
 // Utility type for profile completion logic
-export type ProfileRequiredFields = "company_name" | "naics_codes"
+export type ProfileRequiredFields = "company_name" | "naics_codes" | "psc_codes"
 
 export const REQUIRED_PROFILE_FIELDS: ProfileRequiredFields[] = [
   "company_name", 
-  "naics_codes"
+  "naics_codes",
+  "psc_codes"
 ]
 
 // Helper function type definitions
