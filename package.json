@@ -9,11 +9,11 @@
   "scripts": {
     "dev": "next dev --turbo",
     "dev:legacy": "next dev",
-    "build": "next build --turbo",
+    "build": "next build",
     "turbo": "next dev --turbo",
     "start": "next start",
     "lint": "next lint",
-    "preview": "next build --turbo && next start",
+    "preview": "next build && next start",
     "test": "vitest",
     "test:run": "vitest run",
     "postinstall": "prisma generate",
