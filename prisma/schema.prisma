@@ -131,7 +131,7 @@ model Rfq {
   @@index([status, deadline_date])
   @@index([agency])
   @@index([posted_date])
-  @@index([naics_codes(length: 255)])
+  @@index([naics_codes])
   @@index([state])
   @@index([contract_value_min, contract_value_max])
   @@map(name: "rfqs")
