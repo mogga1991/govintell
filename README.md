@@ -1,90 +1,173 @@
-# Taxonomy
+# GovIntelligence
 
-An open source application built using the new router, server components and everything new in Next.js 13.
+A modern government contracting intelligence and RFQ management platform built with Next.js 15 and React 19.
 
-> **Warning**
-> This app is a work in progress. I'm building this in public. You can follow the progress on Twitter [@shadcn](https://twitter.com/shadcn).
-> See the roadmap below.
+## 🚀 Features
 
-## About this project
+### RFQ Management
+- **Browse Opportunities**: View and search government RFQ opportunities
+- **Save & Organize**: Bookmark interesting opportunities for later review
+- **Detailed Analysis**: Access comprehensive RFQ information including requirements, deadlines, and contract values
+- **Product Research**: Research relevant products and solutions for each opportunity
 
-This project as an experiment to see how a modern app (with features like authentication, subscriptions, API routes, static pages for docs ...etc) would work in Next.js 13 and server components.
+### User Interface
+- **Clean Design**: Simple, intuitive interface focused on usability
+- **Responsive Layout**: Works seamlessly on desktop and mobile devices
+- **Modern Components**: Built with shadcn/ui components and Tailwind CSS
+- **Real-time Updates**: Live data updates and status indicators
 
-**This is not a starter template.**
+### Documentation & Support
+- **Comprehensive Docs**: Built-in documentation with step-by-step guides
+- **Support Center**: FAQ and contact information for user assistance
+- **User Onboarding**: Progressive profile completion and guided setup
 
-A few people have asked me to turn this into a starter. I think we could do that once the new features are out of beta.
+## 🛠️ Tech Stack
 
-## Note on Performance
+- **Framework**: Next.js 15 with App Router
+- **Runtime**: React 19
+- **Styling**: Tailwind CSS + shadcn/ui
+- **Database**: Prisma ORM
+- **Authentication**: NextAuth.js
+- **Icons**: Lucide React
+- **Development**: TypeScript, ESLint, Prettier
 
-> **Warning**
-> This app is using the unstable releases for Next.js 13 and React 18. The new router and app dir is still in beta and not production-ready.
-> **Expect some performance hits when testing the dashboard**.
-> If you see something broken, you can ping me [@shadcn](https://twitter.com/shadcn).
+## 🏃‍♂️ Getting Started
 
-## Features
+### Prerequisites
+- Node.js 18+ 
+- npm or yarn
+- Database (PostgreSQL recommended)
 
-- New `/app` dir,
-- Routing, Layouts, Nested Layouts and Layout Groups
-- Data Fetching, Caching and Mutation
-- Loading UI
-- Route handlers
-- Metadata files
-- Server and Client Components
-- API Routes and Middlewares
-- Authentication using **NextAuth.js**
-- ORM using **Prisma**
-- Database on **PlanetScale**
-- UI Components built using **Radix UI**
-- Documentation and blog using **MDX** and **Contentlayer**
-- Subscriptions using **Stripe**
-- Styled using **Tailwind CSS**
-- Validations using **Zod**
-- Written in **TypeScript**
+### Installation
 
-## Roadmap
+1. **Clone the repository**
+   ```bash
+   git clone <repository-url>
+   cd taxonomy
+   ```
 
-- [x] ~Add MDX support for basic pages~
-- [x] ~Build marketing pages~
-- [x] ~Subscriptions using Stripe~
-- [x] ~Responsive styles~
-- [x] ~Add OG image for blog using @vercel/og~
-- [x] Dark mode
+2. **Install dependencies**
+   ```bash
+   npm install
+   ```
 
-## Known Issues
+3. **Set up environment variables**
+   ```bash
+   cp .env.example .env.local
+   ```
+   Fill in your database URL and other required environment variables.
 
-A list of things not working right now:
+4. **Set up the database**
+   ```bash
+   npx prisma generate
+   npx prisma db push
+   ```
 
-1. ~GitHub authentication (use email)~
-2. ~[Prisma: Error: ENOENT: no such file or directory, open '/var/task/.next/server/chunks/schema.prisma'](https://github.com/prisma/prisma/issues/16117)~
-3. ~[Next.js 13: Client side navigation does not update head](https://github.com/vercel/next.js/issues/42414)~
-4. [Cannot use opengraph-image.tsx inside catch-all routes](https://github.com/vercel/next.js/issues/48162)
+5. **Run the development server**
+   ```bash
+   npm run dev
+   ```
 
-## Why not tRPC, Turborepo or X?
+6. **Open your browser**
+   Navigate to [http://localhost:3000](http://localhost:3000)
 
-I might add this later. For now, I want to see how far we can get using Next.js only.
+## 📁 Project Structure
 
-If you have some suggestions, feel free to create an issue.
-
-## Running Locally
-
-1. Install dependencies using pnpm:
-
-```sh
-pnpm install
+```
+├── app/                    # Next.js App Router pages
+│   ├── (auth)/            # Authentication pages
+│   ├── (dashboard)/       # Dashboard pages
+│   └── (marketing)/       # Marketing pages
+├── components/            # Reusable React components
+│   ├── ui/               # shadcn/ui components
+│   └── ...               # Custom components
+├── lib/                  # Utility libraries and configurations
+├── types/                # TypeScript type definitions
+├── prisma/               # Database schema and migrations
+└── public/               # Static assets
 ```
 
-2. Copy `.env.example` to `.env.local` and update the variables.
+## 🎨 Key Components
 
-```sh
-cp .env.example .env.local
-```
+### RfqCard
+Simple, clean cards displaying RFQ information with save/unsave functionality.
 
-3. Start the development server:
+### Documentation Pages
+- `/docs` - Platform usage guides and tutorials
+- `/support` - FAQ and support information
 
-```sh
-pnpm dev
-```
+### Research Features
+- Product research tools
+- Requirements analysis
+- Matching algorithms
 
-## License
+## 🔧 Configuration
 
-Licensed under the [MIT license](https://github.com/shadcn/taxonomy/blob/main/LICENSE.md).
+### Dashboard Navigation
+The platform includes configurable navigation in `config/dashboard.ts`:
+- Documentation access
+- Support center
+- User settings
+- Billing management
+
+### Icons
+Custom icon set based on Lucide React with platform-specific additions for government contracting (medical, technology, security, etc.).
+
+## 📊 Features in Detail
+
+### RFQ Opportunities
+- Government contract listings
+- Advanced search and filtering
+- Categorization by NAICS/PSC codes
+- Contract value estimation
+- Deadline tracking
+
+### User Management
+- Profile completion tracking
+- Company information management
+- Preference settings
+- Activity history
+
+### Research Tools
+- Product matching algorithms
+- Requirements extraction
+- Competitive analysis
+- Quote generation
+
+## 🐛 Bug Fixes
+
+This version includes fixes for:
+- React 19 compatibility issues
+- HTML structure validation errors
+- Icon loading problems
+- Duplicate key warnings
+- Form submission handling
+
+## 🚀 Deployment
+
+The application is ready for deployment on platforms like:
+- Vercel (recommended for Next.js)
+- Netlify
+- Railway
+- Self-hosted solutions
+
+Make sure to set up your environment variables and database in your deployment environment.
+
+## 📄 License
+
+[Add your license information here]
+
+## 🤝 Contributing
+
+[Add contribution guidelines here]
+
+## 📞 Support
+
+For support and questions:
+- Check the built-in documentation at `/docs`
+- Visit the support center at `/support`
+- Contact: support@govintelligence.com
+
+---
+
+Built with ❤️ for government contractors and procurement professionals.
