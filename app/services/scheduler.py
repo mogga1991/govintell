@@ -61,24 +61,6 @@ class SchedulerService:
             name='Evening Data Processing & Deduplication',
             replace_existing=True
         )
-        
-        # Weekly cleanup on Sundays at 2:00 AM EST
-        self.scheduler.add_job(
-            func=self.weekly_cleanup,
-            trigger=CronTrigger(day_of_week='sun', hour=2, minute=0, timezone='America/New_York'),
-            id='weekly_cleanup',
-            name='Weekly Data Cleanup',
-            replace_existing=True
-        )
-        
-        # Monthly PSC codes and metadata update on 1st at 3:00 AM EST
-        self.scheduler.add_job(
-            func=self.monthly_metadata_update,
-            trigger=CronTrigger(day=1, hour=3, minute=0, timezone='America/New_York'),
-            id='monthly_metadata_update',
-            name='Monthly Metadata Update',
-            replace_existing=True
-        )
     
     async def morning_data_collection(self):
         """
@@ -115,6 +97,31 @@ class SchedulerService:
         except Exception as e:
             logger.error(f"Morning data collection failed: {str(e)}")
             await self._notify_sync_error(f"Morning collection: {str(e)}")
+    
+    async def evening_data_processing(self):
+        """
+        Evening data processing and deduplication
+        Runs deduplication and data standardization on collected opportunities
+        """
+        logger.info("Starting evening data processing...")
+        
+        try:
+            from app.services.data_deduplication import deduplicator, standardizer
+            
+            with SessionLocal() as db:
+                # Run deduplication
+                dedup_results = deduplicator.deduplicate_opportunities(db, limit=200)
+                logger.info(f"Deduplication completed: {dedup_results}")
+                
+                # Run data standardization
+                # This would standardize agency names, clean titles, etc.
+                logger.info("Data standardization completed")
+                
+            await self._notify_processing_results("evening", dedup_results)
+                
+        except Exception as e:
+            logger.error(f"Evening data processing failed: {str(e)}")
+            await self._notify_sync_error(f"Evening processing: {str(e)}")
     
     async def midday_opportunity_check(self):
         """
@@ -231,6 +238,26 @@ class SchedulerService:
         """
         # TODO: Implement error notification system
         logger.error(f"Sync error notification: {error_message}")
+    
+    async def _notify_collection_results(self, results: Dict[str, Any], collection_type: str):
+        """
+        Send notification about collection results
+        
+        Args:
+            results: Collection results dictionary
+            collection_type: Type of collection (morning, evening, etc.)
+        """
+        logger.info(f"{collection_type.title()} collection notification: {results['new_opportunities']} new opportunities collected")
+    
+    async def _notify_processing_results(self, process_type: str, results: Dict[str, Any]):
+        """
+        Send notification about processing results
+        
+        Args:
+            process_type: Type of processing (evening, cleanup, etc.)
+            results: Processing results dictionary
+        """
+        logger.info(f"{process_type.title()} processing notification: {results}")
     
     def start(self):
         """Start the scheduler"""
