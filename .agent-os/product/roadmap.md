@@ -1,27 +1,61 @@
 # Product Roadmap
 
-## Phase 1: MVP - Core RFQ Ingestion & Analysis
+## Phase 1: MVP Core Functionality
 
-**Goal:** Establish the core workflow, allowing a user to process a government RFQ from multiple sources, have it analyzed by AI, and generate a quote based on sourced products.
-**Success Criteria:** A user can successfully process an RFQ using any of the three input methods and receive a downloadable CSV quote.
-
-### Features
-- [ ] **Setup SAM.gov API Integration:** Securely store and utilize the SAM.gov API key to enable direct data fetching. `[Effort: S]`
-- [ ] **Feature: Upload RFQ Document:** Create a file upload interface for users to submit RFQ documents (.pdf, .docx) directly for processing. `[Effort: M]`
-- [ ] **Feature: Paste URL for Scraping:** Create a text input field where a user can paste a URL from SAM.gov or DIBBS. The backend will scrape and parse the relevant RFQ data. `[Effort: M]`
-- [ ] **Feature: In-App RFQ Search:** Build a simple search interface (search bar, filters for NIACS/PSC codes) that queries the SAM.gov API and displays a list of active RFQs. `[Effort: L]`
-- [ ] **Core AI Analysis:** Once an RFQ is ingested (from any source), send the document/data to the AI backend to extract key requirements (product specs, quantities, compliance, packaging). `[Effort: L]`
-- [ ] **Automated Product Sourcing:** Use the extracted requirements to automatically search for matching products from a predefined list of vendor/supplier APIs. `[Effort: L]`
-- [ ] **Quote Generation:** Display the sourced products with their prices, allow the user to input a desired profit margin, and generate a final quote as a downloadable CSV file. `[Effort: M]`
-
----
-
-## Phase 2: Workflow & Usability Enhancements
-
-**Goal:** Streamline the post-quote process and improve the user's ability to manage their work within the app.
-**Success Criteria:** Users can track the status of their quotes and automate initial communications.
+**Goal:** Deliver basic RFQ discovery and manual quote generation capabilities
+**Success Criteria:** Users can find relevant RFQs and create basic quotes
 
 ### Features
-- [ ] **n8n Workflow Integration:** Create webhooks to trigger n8n workflows for emailing the generated quote to a POC or sending inquiries to suppliers. `[Effort: M]`
-- [ ] **RFQ Dashboard:** Create a main dashboard where users can see and manage the status of all ingested RFQs (e.g., New, Analyzing, Sourced, Quoted). `[Effort: L]`
-- [ ] **Saved Searches & Alerts:** Allow users to save common search criteria and receive notifications for new, matching RFQs. `[Effort: M]`
+
+- [ ] User authentication and onboarding - Basic user registration and profile setup `S`
+- [ ] Government API integration - Connect to SAM.gov for RFQ data retrieval `L`
+- [ ] RFQ filtering and search - Filter by NAICS codes, keywords, and agency `M`
+- [ ] Manual quote builder - Simple form-based quote creation with margin calculation `M`
+- [ ] Basic dashboard - Display active RFQs and quote status `S`
+
+### Dependencies
+
+- SAM.gov API access and documentation
+- NextAuth.js setup for authentication
+- Database schema design for RFQs and quotes
+
+## Phase 2: AI-Powered Automation
+
+**Goal:** Implement AI product sourcing and automated quote generation
+**Success Criteria:** 70% reduction in time per quote creation
+
+### Features
+
+- [ ] AI product identification - Parse RFQ requirements to identify specific products `L`
+- [ ] Automated supplier sourcing - Web scraping and API integration for supplier data `XL`
+- [ ] Competitive pricing analysis - Compare supplier prices and suggest optimal margins `L`
+- [ ] Quote template system - Government-compliant quote formatting and generation `M`
+- [ ] DIBBS integration - Connect to Defense Industrial Base Business System `L`
+- [ ] Opportunity alerts - Real-time notifications for matching RFQs `S`
+
+### Dependencies
+
+- AI model integration (Gemini, OpenAI, Deepseek)
+- Web scraping infrastructure
+- DIBBS API access
+- Email notification system
+
+## Phase 3: Advanced Analytics and Collaboration
+
+**Goal:** Provide comprehensive analytics and team collaboration features
+**Success Criteria:** Improve win rates by 25% through data-driven insights
+
+### Features
+
+- [ ] Win rate analytics - Track bidding success across agencies and product categories `M`
+- [ ] Supplier relationship management - Track supplier performance and pricing history `L`
+- [ ] Team collaboration tools - Multi-user access with role-based permissions `M`
+- [ ] Advanced reporting - Profit analysis, market trends, and competitive intelligence `L`
+- [ ] Mobile responsive design - Optimize for mobile and tablet usage `M`
+
+### Dependencies
+
+- Analytics infrastructure setup
+- Mobile testing devices
+- Advanced database optimization
+- User role management system

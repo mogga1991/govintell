@@ -1,68 +1,40 @@
-# Python
-__pycache__/
-*.py[cod]
-*$py.class
-*.so
-.Python
-build/
-develop-eggs/
-dist/
-downloads/
-eggs/
-.eggs/
-lib/
-lib64/
-parts/
-sdist/
-var/
-wheels/
-share/python-wheels/
-*.egg-info/
-.installed.cfg
-*.egg
-MANIFEST.in
+# See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
 
-# Virtual Environment
-venv/
-env/
-ENV/
+# dependencies
+/node_modules
+/.pnp
+.pnp.js
 
-# Environment Variables
-.env
-.env.local
-.env.production
+# testing
+/coverage
 
-# Database
-*.db
-*.sqlite3
+# next.js
+/.next/
+/out/
 
-# IDEs
-.vscode/
-.idea/
-*.swp
-*.swo
+# production
+/build
 
-# OS
+# misc
 .DS_Store
-Thumbs.db
+*.pem
 
-# Logs
-*.log
-logs/
+# debug
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnpm-debug.log*
 
-# Node modules (frontend)
-frontend/node_modules/
-frontend/dist/
-frontend/.vite/
+# local env files
+.env*.local
+.env
 
-# Temporary files
-tmp/
-temp/
-*.tmp
+# vercel
+.vercel
 
-# CSV exports
-exports/
-*.csv
+# typescript
+*.tsbuildinfo
+next-env.d.ts
 
-# Uploaded documents
-uploads/
+.vscode
+.contentlayer

@@ -1,110 +1,69 @@
 # Technical Stack
- 
-## Stack Summary
- 
-- App Framework: Python 3.11+
-- Backend Framework: FastAPI latest
-- Primary Database: PostgreSQL 16+
-- JavaScript Framework: React latest
-- Build Tool: Vite
-- CSS Framework: TailwindCSS 4.0+
-- UI Components: Shadcn/ui
-- AI Orchestration: LangChain (Python)
-- Automation Webhooks: n8n
-- Application Hosting: Render (Backend) & Vercel (Frontend)
-- Database Hosting: Render Managed PostgreSQL
-- CI/CD Platform: GitHub Actions
-- Code Repository URL: [To be created]
-
-> Last Updated: 2025-09-03
-> Version: 1.0.0
 
 ## Application Framework
+Next.js 14+ (App Router)
 
-- **Framework:** FastAPI
-- **Version:** ^0.104.0
+## Database System
+PlanetScale (MySQL)
 
-## Database
+## JavaScript Framework
+React 18
 
-- **Primary Database:** PostgreSQL
-
-## JavaScript
-
-- **Framework:** React
-- **Build Tool:** Vite
-- **Import Strategy:** node
+## Import Strategy
+node
 
 ## CSS Framework
-
-- **Framework:** Tailwind CSS
-- **Version:** ^3.4.0
+Tailwind CSS v3
 
 ## UI Component Library
+shadcn/ui
 
-- **Library:** Shadcn/ui
-- **Base:** Radix UI primitives
+## Fonts Provider
+Google Fonts
 
-## Fonts
+## Icon Library
+Lucide React
 
-- **Provider:** Google Fonts
-- **Primary:** Inter
+## Application Hosting
+Vercel
 
-## Icons
+## Database Hosting
+PlanetScale
 
-- **Library:** Lucide React
-- **Fallback:** Heroicons
+## Asset Hosting
+Vercel (integrated)
 
-## AI & ML
+## Deployment Solution
+Vercel (automatic deployments)
 
-- **Orchestration:** LangChain
-- **Version:** ^0.1.0
+## Code Repository URL
+To be determined
 
-## Hosting & Infrastructure
+## Additional Technologies
 
-### Application Hosting
-- **Platform:** Vercel (Frontend)
-- **Backend:** Railway / Render
-
-### Database Hosting
-- **Provider:** Neon / Supabase
-- **Environment:** Cloud PostgreSQL
-
-### Asset Hosting
-- **CDN:** Vercel Edge Network
-- **Static Assets:** Built-in Vite asset optimization
-
-### Deployment
-- **Solution:** GitHub Actions + Vercel
-- **Strategy:** Continuous deployment from main branch
-
-## Development Tools
-
-### Code Repository
-- **Platform:** GitHub
-- **URL:** To be configured
-
-### Package Management
-- **Frontend:** npm/pnpm
-- **Backend:** pip + requirements.txt
-
-### Development Environment
-- **Frontend:** Vite dev server
-- **Backend:** FastAPI with uvicorn
-- **Database:** Local PostgreSQL + Docker
-
-## Additional Stack Components
+### ORM
+Prisma
 
 ### Authentication
-- **Strategy:** JWT tokens
-- **Library:** FastAPI-Users or custom implementation
+NextAuth.js (Auth.js)
 
-### API Documentation
-- **Tool:** FastAPI automatic OpenAPI/Swagger
+### AI Models
+- Gemini (Google)
+- OpenAI GPT-4
+- Deepseek
 
-### Monitoring & Analytics
-- **Error Tracking:** To be configured
-- **Performance:** Built-in FastAPI metrics
+### API Integrations
+- SAM.gov API
+- DIBBS API
+- Web scraping for supplier data
 
-### Testing
-- **Frontend:** Vitest + React Testing Library
-- **Backend:** pytest + httpx
+### State Management
+React Context / Zustand
+
+### Type Safety
+TypeScript
+
+### Development Tools
+- ESLint
+- Prettier
+- Husky (Git hooks)

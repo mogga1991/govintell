@@ -1,5 +1,5 @@
-# RFP Intelligence Mission (Lite)
+# Product Mission (Lite)
 
-RFP Intelligence is a procurement automation tool that helps government contractors find and respond to RFQs by analyzing solicitation documents, sourcing matching products, and generating quotes.
+GovIntelligence is an AI-powered SaaS tool that helps small businesses find relevant government RFQs and automatically generate competitive quotes by sourcing products and calculating margins to win more government contracts.
 
-The platform serves Procurement Specialists and Small Business Owners in government contracting, delivering AI-powered analysis that saves hours of manual work per solicitation and streamlines the complex RFP response process.
+GovIntelligence serves small business government contractors who need to efficiently discover opportunities and generate competitive bids. Unlike manual research approaches that take hours per quote, GovIntelligence provides end-to-end automation from RFQ discovery through quote generation, resulting in 90% time savings and 300% increase in bid capacity.

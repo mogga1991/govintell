@@ -1,0 +1,433 @@
+"use client"
+
+import * as React from "react"
+import { useRouter, useSearchParams } from "next/navigation"
+import { User } from "@prisma/client"
+
+import { RfqSearchFilters, RfqWithRelations, RfqStatusType } from "@/types/rfq"
+import { cn } from "@/lib/utils"
+import { DashboardHeader } from "@/components/header"
+import { DashboardShell } from "@/components/shell"
+import { RfqSearchFilters as SearchFiltersComponent } from "@/components/rfq-search-filters"
+import { RfqCard } from "@/components/rfq-card"
+import { Button } from "@/components/ui/button"
+import { Alert, AlertDescription } from "@/components/ui/alert"
+import { ProfileProgressBanner } from "@/components/profile-progress-banner"
+import { ProfileAwareEmptyState } from "@/components/profile-aware-empty-state"
+import { Icons } from "@/components/icons"
+import { Skeleton } from "@/components/ui/skeleton"
+import { Badge } from "@/components/ui/badge"
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+
+interface RfqSearchResponse {
+  success: boolean
+  data: {
+    rfqs: RfqWithRelations[]
+    total: number
+    page: number
+    limit: number
+    filters: RfqSearchFilters
+    facets: {
+      agencies: { name: string; count: number }[]
+      states: { code: string; count: number }[]
+      contract_types: { type: string; count: number }[]
+      set_aside_types: { type: string; count: number }[]
+    }
+  }
+}
+
+export default function RFQsPage() {
+  const router = useRouter()
+  const searchParams = useSearchParams()
+  
+  const [user, setUser] = React.useState<User | null>(null)
+  const [userLoading, setUserLoading] = React.useState(true)
+  const [rfqs, setRfqs] = React.useState<RfqWithRelations[]>([])
+  const [total, setTotal] = React.useState(0)
+  const [facets, setFacets] = React.useState<any>({
+    agencies: [],
+    states: [],
+    contract_types: [],
+    set_aside_types: []
+  })
+  const [isLoading, setIsLoading] = React.useState(true)
+  const [error, setError] = React.useState<string | null>(null)
+  const [currentPage, setCurrentPage] = React.useState(1)
+  const [sortBy, setSortBy] = React.useState("deadline")
+  const [sortOrder, setSortOrder] = React.useState<"asc" | "desc">("asc")
+  const [viewMode, setViewMode] = React.useState<"list" | "compact">("list")
+
+  // Parse current filters from URL params
+  const currentFilters = React.useMemo((): RfqSearchFilters => {
+    return {
+      keyword: searchParams?.get('keyword') || undefined,
+      naics_codes: searchParams?.get('naics_codes')?.split(',') || undefined,
+      psc_codes: searchParams?.get('psc_codes')?.split(',') || undefined,
+      states: searchParams?.get('states')?.split(',') || undefined,
+      agencies: searchParams?.get('agencies')?.split(',') || undefined,
+      contract_value_min: searchParams?.get('contract_value_min') ? Number(searchParams.get('contract_value_min')) : undefined,
+      contract_value_max: searchParams?.get('contract_value_max') ? Number(searchParams.get('contract_value_max')) : undefined,
+      status: searchParams?.get('status')?.split(',') || ['Open'],
+      saved_only: searchParams?.get('saved_only') === 'true'
+    }
+  }, [searchParams])
+
+  // Fetch user data
+  React.useEffect(() => {
+    const fetchUser = async () => {
+      try {
+        const response = await fetch('/api/user')
+        if (response.ok) {
+          const userData = await response.json()
+          setUser(userData)
+        } else {
+          router.push('/login')
+          return
+        }
+      } catch (error) {
+        console.error('Error fetching user:', error)
+        router.push('/login')
+        return
+      } finally {
+        setUserLoading(false)
+      }
+    }
+
+    fetchUser()
+  }, [router])
+
+  // Fetch RFQs
+  const fetchRfqs = React.useCallback(async () => {
+    if (!user || userLoading) return
+    
+    setIsLoading(true)
+    setError(null)
+    
+    try {
+      const params = new URLSearchParams()
+      
+      // Add all filter parameters
+      Object.entries(currentFilters).forEach(([key, value]) => {
+        if (value !== undefined && value !== null) {
+          if (Array.isArray(value)) {
+            if (value.length > 0) params.set(key, value.join(','))
+          } else {
+            params.set(key, value.toString())
+          }
+        }
+      })
+      
+      // Add sorting
+      params.set('sort_by', sortBy)
+      params.set('sort_order', sortOrder)
+      
+      const response = await fetch(`/api/rfqs/search?${params.toString()}`)
+      
+      if (!response.ok) {
+        throw new Error('Failed to fetch RFQs')
+      }
+      
+      const data: RfqSearchResponse = await response.json()
+      
+      if (data.success) {
+        setRfqs(data.data.rfqs)
+        setTotal(data.data.total)
+        setFacets(data.data.facets)
+      } else {
+        throw new Error('Invalid response format')
+      }
+    } catch (error) {
+      console.error('Error fetching RFQs:', error)
+      setError(error instanceof Error ? error.message : 'An error occurred')
+    } finally {
+      setIsLoading(false)
+    }
+  }, [currentFilters, sortBy, sortOrder, user, userLoading])
+
+  // Fetch RFQs when filters change
+  React.useEffect(() => {
+    fetchRfqs()
+  }, [fetchRfqs])
+
+  // Update URL when filters change
+  const handleFiltersChange = (newFilters: RfqSearchFilters) => {
+    const params = new URLSearchParams()
+    
+    Object.entries(newFilters).forEach(([key, value]) => {
+      if (value !== undefined && value !== null && key !== 'page' && key !== 'limit') {
+        if (Array.isArray(value)) {
+          if (value.length > 0) params.set(key, value.join(','))
+        } else {
+          params.set(key, value.toString())
+        }
+      }
+    })
+    
+    setCurrentPage(1)
+    router.push(`/rfqs?${params.toString()}`)
+  }
+
+  // Handle RFQ actions
+  const handleSaveRfq = async (rfqId: string) => {
+    try {
+      const response = await fetch(`/api/rfqs/${rfqId}/save`, {
+        method: 'POST'
+      })
+      
+      if (response.ok) {
+        setRfqs(prev => prev.map(rfq => 
+          rfq.id === rfqId ? { ...rfq, isSaved: true } : rfq
+        ))
+      }
+    } catch (error) {
+      console.error('Error saving RFQ:', error)
+    }
+  }
+
+  const handleUnsaveRfq = async (rfqId: string) => {
+    try {
+      const response = await fetch(`/api/rfqs/${rfqId}/save`, {
+        method: 'DELETE'
+      })
+      
+      if (response.ok) {
+        setRfqs(prev => prev.map(rfq => 
+          rfq.id === rfqId ? { ...rfq, isSaved: false } : rfq
+        ))
+      }
+    } catch (error) {
+      console.error('Error unsaving RFQ:', error)
+    }
+  }
+
+  const handleStatusChange = async (rfqId: string, status: RfqStatusType) => {
+    try {
+      const response = await fetch(`/api/rfqs/${rfqId}/status`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ status })
+      })
+      
+      if (response.ok) {
+        setRfqs(prev => prev.map(rfq => 
+          rfq.id === rfqId ? { ...rfq, userStatus: { ...rfq.userStatus, status } as any } : rfq
+        ))
+      }
+    } catch (error) {
+      console.error('Error updating RFQ status:', error)
+    }
+  }
+
+  if (userLoading) {
+    return (
+      <DashboardShell>
+        <DashboardHeader heading="RFQ Opportunities" text="Loading..." />
+        <div className="space-y-4">
+          {[...Array(5)].map((_, i) => (
+            <Skeleton key={i} className="h-64 w-full" />
+          ))}
+        </div>
+      </DashboardShell>
+    )
+  }
+
+  if (!user) {
+    return null // Will redirect to login
+  }
+
+  return (
+    <DashboardShell>
+      <div className="space-y-6">
+      <DashboardHeader 
+        heading="RFQ Opportunities" 
+        text="Browse and search government contracting opportunities matched to your business."
+      />
+      
+      {/* Profile Progress Banner */}
+      {user && (
+        <ProfileProgressBanner 
+          user={user}
+          showOnPages={["/rfqs"]}
+          className="mb-6"
+        />
+      )}
+
+      <div className="space-y-6">
+        {/* Search and Filters */}
+        <SearchFiltersComponent
+          currentFilters={currentFilters}
+          facets={facets}
+          onFiltersChange={handleFiltersChange}
+        />
+
+        {/* Results Header */}
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-4">
+            <div className="text-sm text-muted-foreground">
+              {isLoading ? (
+                "Searching..."
+              ) : error ? (
+                "Error loading results"
+              ) : (
+                `${total.toLocaleString()} opportunities found`
+              )}
+            </div>
+            
+            {total > 0 && !isLoading && (
+              <div className="flex items-center gap-2">
+                <span className="text-sm text-muted-foreground">Page {currentPage}</span>
+                <Badge variant="outline">
+                  {((currentPage - 1) * 20) + 1}-{Math.min(currentPage * 20, total)} of {total}
+                </Badge>
+              </div>
+            )}
+          </div>
+
+          <div className="flex items-center gap-2">
+            {/* Sort Controls */}
+            <Select value={sortBy} onValueChange={setSortBy}>
+              <SelectTrigger className="w-40">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="deadline">Sort by Deadline</SelectItem>
+                <SelectItem value="posted_date">Sort by Posted</SelectItem>
+                <SelectItem value="value">Sort by Value</SelectItem>
+              </SelectContent>
+            </Select>
+            
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc')}
+            >
+              {sortOrder === 'asc' ? (
+                <Icons.sortAsc className="h-4 w-4" />
+              ) : (
+                <Icons.sortDesc className="h-4 w-4" />
+              )}
+            </Button>
+
+            {/* View Mode Toggle */}
+            <div className="flex border rounded-md">
+              <Button
+                variant={viewMode === 'list' ? 'default' : 'ghost'}
+                size="sm"
+                onClick={() => setViewMode('list')}
+                className="rounded-r-none"
+              >
+                <Icons.list className="h-4 w-4" />
+              </Button>
+              <Button
+                variant={viewMode === 'compact' ? 'default' : 'ghost'}
+                size="sm"
+                onClick={() => setViewMode('compact')}
+                className="rounded-l-none"
+              >
+                <Icons.grid className="h-4 w-4" />
+              </Button>
+            </div>
+          </div>
+        </div>
+
+        {/* Error State */}
+        {error && (
+          <Alert variant="destructive">
+            <Icons.alertCircle className="h-4 w-4" />
+            <AlertDescription>
+              {error}
+              <Button variant="outline" size="sm" onClick={fetchRfqs} className="ml-2">
+                Try Again
+              </Button>
+            </AlertDescription>
+          </Alert>
+        )}
+
+        {/* RFQ List */}
+        {isLoading ? (
+          <div className="space-y-4">
+            {[...Array(5)].map((_, i) => (
+              <Skeleton key={i} className={viewMode === 'compact' ? "h-24" : "h-64"} />
+            ))}
+          </div>
+        ) : rfqs.length === 0 && !error ? (
+          <ProfileAwareEmptyState
+            user={user!}
+            searchContext={{
+              hasFilters: Object.values(currentFilters).some(value => 
+                value !== undefined && value !== null && 
+                (Array.isArray(value) ? value.length > 0 : value !== '')
+              ),
+              filtersApplied: Object.entries(currentFilters)
+                .filter(([key, value]) => 
+                  value !== undefined && value !== null && 
+                  (Array.isArray(value) ? value.length > 0 : value !== '')
+                )
+                .map(([key, value]) => 
+                  Array.isArray(value) ? `${key}: ${value.join(', ')}` : `${key}: ${value}`
+                )
+            }}
+            variant="search_empty"
+          />
+        ) : (
+          <div className={cn(
+            "space-y-4",
+            viewMode === 'compact' && "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 space-y-0"
+          )}>
+            {rfqs.map((rfq) => (
+              <RfqCard
+                key={rfq.id}
+                rfq={rfq}
+                onSave={handleSaveRfq}
+                onUnsave={handleUnsaveRfq}
+                onStatusChange={handleStatusChange}
+                compact={viewMode === 'compact'}
+              />
+            ))}
+          </div>
+        )}
+
+        {/* Pagination */}
+        {total > 20 && !isLoading && (
+          <div className="flex items-center justify-center gap-2">
+            <Button
+              variant="outline"
+              onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
+              disabled={currentPage === 1}
+            >
+              <Icons.chevronLeft className="h-4 w-4 mr-2" />
+              Previous
+            </Button>
+            
+            <div className="flex items-center gap-1">
+              {Array.from({ length: Math.min(5, Math.ceil(total / 20)) }, (_, i) => {
+                const page = i + 1
+                return (
+                  <Button
+                    key={page}
+                    variant={currentPage === page ? "default" : "outline"}
+                    size="sm"
+                    onClick={() => setCurrentPage(page)}
+                  >
+                    {page}
+                  </Button>
+                )
+              })}
+            </div>
+            
+            <Button
+              variant="outline"
+              onClick={() => setCurrentPage(prev => Math.min(Math.ceil(total / 20), prev + 1))}
+              disabled={currentPage >= Math.ceil(total / 20)}
+            >
+              Next
+              <Icons.chevronRight className="h-4 w-4 ml-2" />
+            </Button>
+          </div>
+        )}
+      </div>
+      </div>
+    </DashboardShell>
+  )
+}
